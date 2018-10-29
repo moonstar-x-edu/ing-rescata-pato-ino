@@ -1,0 +1,2 @@
+# Proyecto Ingeniería Arduino
+Aquí se encuentra el código de nuestro proyecto de ingeniería en el cual se rescata un pato y se lo lleva a una zona de seguridad mediante un sistema vehicular hidraulico y sistema de detección por Arduino.
