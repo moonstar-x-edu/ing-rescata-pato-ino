@@ -33,7 +33,12 @@ void loop() {
   enRescate = !enRescate;
   Serial.print("Valor de Rescate: ");
   Serial.println(enRescate);
-  delay(5000); // Darle tiempo al vehiculo de retroceder antes de que vuelva a medir valores de altura.
+  Serial.println("Esperando...");
+  // Darle tiempo al vehiculo de retroceder antes de que vuelva a medir valores de altura.
+  for (int i = 1; i < 6; i++) {
+    Serial.println(i);
+    delay(1000);
+  }
 }
 
 /*
@@ -73,27 +78,27 @@ void medicionConstante(int alturaPorMedir) {
 */
 void controlServos(bool estado) {
   Serial.println("Empieza Movimiento.");
-  Serial.println("Extension Brazo.");
+  Serial.println("Extension Brazo...");
   for (posServoBrazo = 0; posServoBrazo <= 90; posServoBrazo++) {
     servoBrazo.write(posServoBrazo);
     delay(50);
   }
   delay(1000);
   if (!estado) {
-    Serial.println("Cerrando Pinza.");
+    Serial.println("Cerrando Pinza...");
     for (posServoPinza = 0; posServoPinza <= 180; posServoPinza++) {
       servoPinza.write(posServoPinza);
       delay(20);
     }
   } else {
-    Serial.println("Abriendo Pinza.");
+    Serial.println("Abriendo Pinza...");
     for (posServoPinza = 180; posServoPinza >= 0; posServoPinza--) {
       servoPinza.write(posServoPinza);
       delay(20);
     }
   }
   delay(1000);
-  Serial.println("Retraccion Brazo.");
+  Serial.println("Retraccion Brazo...");
   for (posServoBrazo = 90; posServoBrazo >= 0; posServoBrazo--) {
     servoBrazo.write(posServoBrazo);
     delay(50);
