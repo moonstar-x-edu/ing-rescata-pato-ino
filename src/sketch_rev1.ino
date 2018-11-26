@@ -2,22 +2,35 @@
 
 // Variables Iniciales
 Servo servoBrazo, servoPinza;
+int alphaMinServoBrazo = 0; // Abajo
+int alphaMinServoPinza = 0; // Abierto
+int alphaMaxServoBrazo = 45; // Arriba
+int alphaMaxServoPinza = 40; // Cerrado
+
 int posServoBrazo = 0;
 int posServoPinza = 0;
 int pinServoBrazo = 5;
 int pinServoPinza = 6;
+
 int trigger = 4;
 int echo = 2;
-bool enRescate = false;
+double VEL_SND = 0.0343;
+
 double tiempoSonido, alturaMedida;
 int alturaDefecto = 15; // Por definir
 int alturaPato = alturaDefecto - 7; // Solo pato, sin contar plataforma de elevacion ni edificio.
 int alturaSeguridad = alturaDefecto - 2;
 
+bool enRescate = false;
+int tiempoPausa = 8;
+int medicionesRangoSeguro = 3;
+
 void setup() {
   Serial.begin(9600);
   servoBrazo.attach(pinServoBrazo);
   servoPinza.attach(pinServoPinza);
+  servoBrazo.write(alphaMinServoBrazo);
+  servoPinza.write(alphaMinServoPinza);
   pinMode(trigger, OUTPUT);
   pinMode(echo, INPUT);
 }
@@ -35,7 +48,7 @@ void loop() {
   Serial.println(enRescate);
   Serial.println("Esperando...");
   // Darle tiempo al vehiculo de retroceder antes de que vuelva a medir valores de altura.
-  for (int i = 1; i < 6; i++) {
+  for (int i = 1; i < tiempoPausa; i++) {
     Serial.println(i);
     delay(1000);
   }
@@ -51,12 +64,12 @@ void loop() {
 */
 void medicionConstante(int alturaPorMedir) {
   int i = 0;
-  while (i < 3) {
+  while (i < medicionesRangoSeguro) {
     digitalWrite(trigger, HIGH);
     delay(1000);
     digitalWrite(trigger, LOW);
     tiempoSonido = pulseIn(echo, HIGH);
-    alturaMedida = tiempoSonido/2*0.0343;
+    alturaMedida = tiempoSonido / 2 * VEL_SND;
 
     Serial.print("Altura: ");
     Serial.println(alturaMedida);
@@ -79,27 +92,27 @@ void medicionConstante(int alturaPorMedir) {
 void controlServos(bool estado) {
   Serial.println("Empieza Movimiento.");
   Serial.println("Extension Brazo...");
-  for (posServoBrazo = 0; posServoBrazo <= 90; posServoBrazo++) {
+  for (posServoBrazo = alphaMinServoBrazo; posServoBrazo <= alphaMaxServoBrazo; posServoBrazo++) {
     servoBrazo.write(posServoBrazo);
     delay(50);
   }
   delay(1000);
   if (!estado) {
     Serial.println("Cerrando Pinza...");
-    for (posServoPinza = 0; posServoPinza <= 180; posServoPinza++) {
+    for (posServoPinza = alphaMinServoPinza; posServoPinza <= alphaMaxServoPinza; posServoPinza++) {
       servoPinza.write(posServoPinza);
       delay(20);
     }
   } else {
     Serial.println("Abriendo Pinza...");
-    for (posServoPinza = 180; posServoPinza >= 0; posServoPinza--) {
+    for (posServoPinza = alphaMaxServoPinza; posServoPinza >= alphaMinServoPinza; posServoPinza--) {
       servoPinza.write(posServoPinza);
       delay(20);
     }
   }
   delay(1000);
   Serial.println("Retraccion Brazo...");
-  for (posServoBrazo = 90; posServoBrazo >= 0; posServoBrazo--) {
+  for (posServoBrazo = alphaMaxServoBrazo; posServoBrazo >= alphaMinServoBrazo; posServoBrazo--) {
     servoBrazo.write(posServoBrazo);
     delay(50);
   }
